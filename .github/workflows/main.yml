@@ -1,0 +1,32 @@
+name: Build for Android (Termux)
+
+on:
+  workflow_dispatch: # 手动触发编译
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      # 编译 Android arm64（绝大多数安卓手机/平板）
+      - name: Build for android arm64
+        run: |
+          CGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -v -o mahjong-helper-android-arm64
+
+      # 编译 Android armv7（老机型）
+      - name: Build for android arm
+        run: |
+          CGO_ENABLED=0 GOOS=android GOARCH=arm go build -v -o mahjong-helper-android-arm
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: mahjong-helper-android
+          path: mahjong-helper-android-*
